@@ -451,7 +451,59 @@ recipe-planner/
 
 ---
 
-## 10. Session Start Checklist for AI Agent
+## 10. Git Workflow & Conventions
+
+### 10.1 Branch Strategy
+
+```
+main            ← Production-ready (only developer merges here)
+develop         ← Integration branch
+  ├── phase-<n>/<slug>     e.g. phase-1/recipe-entity
+  ├── feature/<slug>       e.g. feature/meal-plan-crud
+  ├── fix/<slug>           e.g. fix/shopping-list-dedup
+  └── chore/<slug>         e.g. chore/update-deps
+```
+
+- `main` is protected — no direct pushes ever
+- `develop` is the integration branch — AI Agents must not push here
+- All work flows: feature branch → PR into `develop` → developer merges to `main`
+- Every phase and every big change gets its own branch
+
+### 10.2 Commit Message Format
+
+```
+<type>(<scope>): <description>
+```
+
+| Type | Usage |
+|------|-------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `chore` | Maintenance, deps, tooling |
+| `docs` | Documentation (AGENTS.md, README) |
+| `refactor` | Restructuring code |
+| `test` | Adding/fixing tests |
+
+`scope` is optional — examples: `api`, `entity`, `docker`, `agents`, `auth`
+
+Examples:
+```
+feat(api): add recipe search endpoint
+feat(entity): create Recipe entity with DTO mapping
+chore(docker): update PostgreSQL to 15-alpine
+docs(agents): add branch and commit conventions
+```
+
+### 10.3 AI Agent Rules
+
+- ⛔ **NEVER** commit or push directly to `main` or `develop`
+- ⛔ **NEVER** open PRs targeting `main` or `develop`
+- ✅ **ALWAYS** create a feature/phase/fix branch and push there
+- ✅ **ALWAYS** let the developer review and merge to `develop`/`main`
+
+---
+
+## 11. Session Start Checklist for AI Agent
 
 At the start of every session, confirm:
 
@@ -465,5 +517,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 13, 2026 — Phase 1 scaffolding complete.*
+*Last updated: Jun 13, 2026 — Phase 1 scaffolding complete, git workflow added.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
