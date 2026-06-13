@@ -1,0 +1,20 @@
+# Secrets
+.env
+*.env
+application-prod.yml
+secrets.properties
+
+# Build outputs
+build/
+.gradle/
+*.jar
+!backend/gradle/wrapper/gradle-wrapper.jar
+*.class
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Docker
+docker-compose.override.yml
