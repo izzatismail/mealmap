@@ -275,9 +275,9 @@ recipe-planner/
 
 **Goal:** Working Spring Boot API with Spoonacular integration
 
-- [ ] Spring Boot project initialized
+- [x] Spring Boot project initialized
 - [ ] PostgreSQL connected locally
-- [ ] `application.yml` using environment variables only
+- [x] `application.yml` using environment variables only
 - [ ] `Recipe` entity + `RecipeDto` created
 - [ ] `SpoonacularService` — search, details, by-ingredients
 - [ ] `RecipeRepository` (JPA)
@@ -319,13 +319,13 @@ recipe-planner/
 
 **Goal:** Everything runs in Docker locally + CI validates builds
 
-- [ ] `Dockerfile` (multi-stage, non-root user)
-- [ ] `docker-compose.yml` with:
+- [x] `Dockerfile` (multi-stage, non-root user)
+- [x] `docker-compose.yml` with:
   - PostgreSQL service with health check
   - Backend service with env vars (no hardcoded secrets)
   - Volume for PostgreSQL data
-- [ ] `.env.example` committed (no `.env`)
-- [ ] `.gitignore` covers all secrets and build outputs
+- [x] `.env.example` committed (no `.env`)
+- [x] `.gitignore` covers all secrets and build outputs
 - [ ] `docker-compose up` runs successfully
 - [ ] API reachable at `localhost:8080` via Docker
 - [ ] `.github/workflows/build.yml` created:
@@ -465,5 +465,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Based on initial planning discussions.*
+*Last updated: Jun 13, 2026 — Phase 1 scaffolding complete.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
