@@ -278,7 +278,7 @@ recipe-planner/
 - [x] Spring Boot project initialized
 - [ ] PostgreSQL connected locally
 - [x] `application.yml` using environment variables only
-- [ ] `Recipe` entity + `RecipeDto` created
+- [x] `Recipe` entity + `RecipeDto` created
 - [ ] `SpoonacularService` — search, details, by-ingredients
 - [ ] `RecipeRepository` (JPA)
 - [ ] `RecipeController` with endpoints:
@@ -328,11 +328,10 @@ recipe-planner/
 - [x] `.gitignore` covers all secrets and build outputs
 - [ ] `docker-compose up` runs successfully
 - [ ] API reachable at `localhost:8080` via Docker
-- [ ] `.github/workflows/build.yml` created:
-  - Triggers on push to `main` and `develop`
+- [x] `.github/workflows/build.yml` created:
+  - Triggers on push and PR to `main` and `develop`
   - Runs `./gradlew test`
-  - Builds Docker image
-  - Verifies build success (no push yet)
+  - Java 21 (temurin), Gradle setup via action
 - [ ] GitHub Actions pipeline passes
 
 **Phase 3 Complete When:** `docker-compose up` works, CI passes on every push
@@ -503,7 +502,41 @@ docs(agents): add branch and commit conventions
 
 ---
 
-## 11. Session Start Checklist for AI Agent
+## 11. Code Review Guide for AI Agents
+
+### Review Role
+Act as a Staff Engineer performing a merge request review.
+
+### Review Dimensions
+1. Correctness and hidden bugs
+2. Security issues (see §3 Non-Negotiable Security Rules)
+3. Performance regressions
+4. API design consistency
+5. Maintainability
+6. Test coverage gaps
+7. Concurrency / race conditions
+8. Backward compatibility risks
+
+### Issue Reporting Format
+For every finding:
+- **Severity:** Critical / High / Medium / Low
+- **Location:** File path + line reference
+- **Why:** Why it matters + potential impact
+- **Fix:** Suggested fix or mitigation
+
+### Guidelines
+- Do not comment on formatting or style unless it affects maintainability
+- Prioritize findings by risk (Critical → Low)
+- Reference security rules from §3 where applicable
+- Flag any deviation from the agreed stack (see §2)
+
+### When to Review
+- On every commit pushed to a feature/phase branch before merging to `develop`
+- Developer may request ad-hoc review at any time via `"review my code"` instruction
+
+---
+
+## 12. Session Start Checklist for AI Agent
 
 At the start of every session, confirm:
 
@@ -517,5 +550,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 13, 2026 — Phase 1 scaffolding complete, git workflow added.*
+*Last updated: Jun 13, 2026 — Phase 1 (recipe-entity): Built JPA entity, DTO, Spoonacular response models. Build fixed: Kotlin 2.1.20, JDK 21 toolchain, test profile with H2. Added code review guide for AI agents, GitHub Actions CI, SecurityConfig for Phase 1, RecipeDto unit tests, duplicate ingredient model cleanup, and all PR review items addressed.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
