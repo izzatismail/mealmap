@@ -342,7 +342,7 @@ recipe-planner/
 
 **Goal:** Both platforms browse recipes from backend API
 
-- [ ] KMP project initialized
+- [x] KMP project initialized
 - [ ] Shared module structure set up
 - [ ] Shared: `Recipe`, `MealPlan`, `ShoppingItem` models
 - [ ] Shared: Ktor Client configured (HTTPS only)
@@ -499,6 +499,51 @@ docs(agents): add branch and commit conventions
 - ⛔ **NEVER** open PRs targeting `main` or `develop`
 - ✅ **ALWAYS** create a feature/phase/fix branch and push there
 - ✅ **ALWAYS** let the developer review and merge to `develop`/`main`
+
+### 10.4 Merge Request Format
+
+Every MR/PR must follow this structure — AI Agent must present the full draft to the developer for review before creating:
+
+```
+## Summary
+
+<2-3 sentences describing what this MR achieves and why>
+
+## Changes
+
+- **`<module/path>/`** — <description>
+- **`<module/path>/`** — <description>
+
+## Technical Details
+
+| Key detail | value |
+|---|---|
+
+## Security Review
+
+- **<finding>** ✅/<flag> <detail>
+
+## Notes
+
+- <deferred items, known limitations>
+```
+
+### 10.5 Pre-MR Checklist
+
+Before creating any MR, the AI Agent MUST run a **security compliance check** against §3 (Non-Negotiable Security Rules):
+
+1. Scan all new/changed files for hardcoded secrets, API keys, passwords
+2. Verify `.env`/secrets files are not committed (`.gitignore` check)
+3. Verify no plaintext passwords or tokens in source code
+4. Verify `@Valid`/`@Validated` on controller params where applicable
+5. Verify JWT validation on protected endpoints where applicable
+6. Verify no wildcard CORS in production config where applicable
+7. Summarize findings in the MR's **Security Review** section
+8. If any **Critical** or **High** severity finding exists, **block the MR** and flag to the developer
+
+### 10.6 AI Agent Rule Clarification
+
+- §10.3 ("NEVER open PRs targeting `main` or `develop`") applies to **autonomous** agent action. When the developer explicitly requests an MR, the agent must first present the full draft and pre-MR security check results, then wait for confirmation before executing.
 
 ---
 
