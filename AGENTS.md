@@ -50,6 +50,7 @@
 - **ALWAYS** use environment variables for all secrets
 - **ALWAYS** reference Spoonacular API key as `${SPOONACULAR_API_KEY}` in config
 - **ALWAYS** reference DB password as `${DB_PASSWORD}` in config
+- **NEVER** read, open, display, grep, or otherwise access `.env` file contents — use `git status .env` only to verify it is gitignored
 - GitHub Actions secrets must use `${{ secrets.SECRET_NAME }}` syntax — never inline values
 - Railway environment variables must be set in dashboard — never in code
 
@@ -276,20 +277,20 @@ recipe-planner/
 **Goal:** Working Spring Boot API with Spoonacular integration
 
 - [x] Spring Boot project initialized
-- [ ] PostgreSQL connected locally
+- [x] PostgreSQL connected locally
 - [x] `application.yml` using environment variables only
-- [ ] `Recipe` entity + `RecipeDto` created
-- [ ] `SpoonacularService` — search, details, by-ingredients
-- [ ] `RecipeRepository` (JPA)
-- [ ] `RecipeController` with endpoints:
+- [x] `Recipe` entity + `RecipeDto` created
+- [x] `SpoonacularService` — search, details, by-ingredients
+- [x] `RecipeRepository` (JPA)
+- [x] `RecipeController` with endpoints:
   - `GET /api/recipes/search?query=&limit=`
   - `GET /api/recipes/{id}`
   - `GET /api/recipes/by-ingredients?ingredients=`
   - `GET /api/recipes/cached`
-- [ ] Caching logic (save to DB on first fetch)
-- [ ] `GlobalExceptionHandler` in place
-- [ ] API tested with Postman or curl
-- [ ] Unit tests for `SpoonacularService`
+- [x] Caching logic (save to DB on first fetch)
+- [x] `GlobalExceptionHandler` in place
+- [x] API tested with Postman or curl
+- [x] Unit tests for `SpoonacularService`
 
 **Phase 1 Complete When:** API returns recipe data, results are cached in PostgreSQL, no secrets in code
 
@@ -328,11 +329,10 @@ recipe-planner/
 - [x] `.gitignore` covers all secrets and build outputs
 - [ ] `docker-compose up` runs successfully
 - [ ] API reachable at `localhost:8080` via Docker
-- [ ] `.github/workflows/build.yml` created:
-  - Triggers on push to `main` and `develop`
+- [x] `.github/workflows/build.yml` created:
+  - Triggers on push and PR to `main` and `develop`
   - Runs `./gradlew test`
-  - Builds Docker image
-  - Verifies build success (no push yet)
+  - Java 21 (temurin), Gradle setup via action
 - [ ] GitHub Actions pipeline passes
 
 **Phase 3 Complete When:** `docker-compose up` works, CI passes on every push
@@ -343,7 +343,7 @@ recipe-planner/
 
 **Goal:** Both platforms browse recipes from backend API
 
-- [ ] KMP project initialized
+- [x] KMP project initialized
 - [ ] Shared module structure set up
 - [ ] Shared: `Recipe`, `MealPlan`, `ShoppingItem` models
 - [ ] Shared: Ktor Client configured (HTTPS only)
@@ -501,9 +501,129 @@ docs(agents): add branch and commit conventions
 - ✅ **ALWAYS** create a feature/phase/fix branch and push there
 - ✅ **ALWAYS** let the developer review and merge to `develop`/`main`
 
+### 10.4 Merge Request Format
+
+Every MR/PR must follow this structure — AI Agent must present the full draft to the developer for review before creating:
+
+```
+## Summary
+
+<2-3 sentences describing what this MR achieves and why>
+
+## Changes
+
+- **`<module/path>/`** — <description>
+- **`<module/path>/`** — <description>
+
+## Technical Details
+
+| Key detail | value |
+|---|---|
+
+## Security Review
+
+- **<finding>** ✅/<flag> <detail>
+
+## Notes
+
+- <deferred items, known limitations>
+```
+
+### 10.5 Pre-MR Checklist
+
+Before creating any MR, the AI Agent MUST run a **security compliance check** against §3 (Non-Negotiable Security Rules):
+
+1. Scan all new/changed files for hardcoded secrets, API keys, passwords
+2. Verify `.env`/secrets files are not committed (`.gitignore` check)
+3. Verify no plaintext passwords or tokens in source code
+4. Verify `@Valid`/`@Validated` on controller params where applicable
+5. Verify JWT validation on protected endpoints where applicable
+6. Verify no wildcard CORS in production config where applicable
+7. Summarize findings in the MR's **Security Review** section
+8. If any **Critical** or **High** severity finding exists, **block the MR** and flag to the developer
+
+### 10.6 AI Agent Rule Clarification
+
+- §10.3 ("NEVER open PRs targeting `main` or `develop`") applies to **autonomous** agent action. When the developer explicitly requests an MR, the agent must first present the full draft and pre-MR security check results, then wait for confirmation before executing.
+
+### 10.7 Versioning & Release Tags
+
+```
+Versioning:      SemVer (MAJOR.MINOR.PATCH)
+Phase mapping:   v0.1.0 → Phase 1, v0.2.0 → Phase 2, v1.0.0 → Phase 6 (MVP)
+```
+
+| Branch | `build.gradle.kts` version | Meaning |
+|--------|---------------------------|---------|
+| `main` | `0.1.0` (no `-SNAPSHOT`) | Current release |
+| `develop` | `0.2.0-SNAPSHOT` | Work in progress toward next release |
+
+**Release Workflow** (performed by developer after Phase PR is merged to `main`):
+
+```bash
+# 1. Checkout main and pull
+git checkout main && git pull origin main
+
+# 2. Bump version to release (e.g., 0.1.0)
+# Edit backend/build.gradle.kts: version = "0.1.0"
+git commit -m "chore(release): bump version to 0.1.0"
+git push origin main
+
+# 3. Tag the release
+git tag -a v0.1.0 -m "Phase 1: Backend Foundation"
+git push origin v0.1.0
+
+# 4. Bump develop for next cycle
+git checkout develop
+# Edit backend/build.gradle.kts: version = "0.2.0-SNAPSHOT"
+git commit -m "chore(release): prepare next development iteration 0.2.0-SNAPSHOT"
+git push origin develop
+```
+
+**Rules:**
+- ✅ **ALWAYS** bump version in `build.gradle.kts` to match git tag
+- ✅ `main` version must match the latest tag (no `-SNAPSHOT`)
+- ✅ `develop` version must point to next planned release with `-SNAPSHOT`
+- ⛔ **NEVER** push `-SNAPSHOT` versions to `main`
+- ⛔ **NEVER** tag a commit without bumping the build version first
+
 ---
 
-## 11. Session Start Checklist for AI Agent
+## 11. Code Review Guide for AI Agents
+
+### Review Role
+Act as a Staff Engineer performing a merge request review.
+
+### Review Dimensions
+1. Correctness and hidden bugs
+2. Security issues (see §3 Non-Negotiable Security Rules)
+3. Performance regressions
+4. API design consistency
+5. Maintainability
+6. Test coverage gaps
+7. Concurrency / race conditions
+8. Backward compatibility risks
+
+### Issue Reporting Format
+For every finding:
+- **Severity:** Critical / High / Medium / Low
+- **Location:** File path + line reference
+- **Why:** Why it matters + potential impact
+- **Fix:** Suggested fix or mitigation
+
+### Guidelines
+- Do not comment on formatting or style unless it affects maintainability
+- Prioritize findings by risk (Critical → Low)
+- Reference security rules from §3 where applicable
+- Flag any deviation from the agreed stack (see §2)
+
+### When to Review
+- On every commit pushed to a feature/phase branch before merging to `develop`
+- Developer may request ad-hoc review at any time via `"review my code"` instruction
+
+---
+
+## 12. Session Start Checklist for AI Agent
 
 At the start of every session, confirm:
 
@@ -517,5 +637,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 13, 2026 — Phase 1 scaffolding complete, git workflow added.*
+*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked. Added §10.7 Versioning & Release Tags.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
