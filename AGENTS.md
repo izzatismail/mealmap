@@ -637,5 +637,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked. Added §10.7 Versioning & Release Tags.*
+*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked. Added §10.7 Versioning & Release Tags. Released v0.1.0. Develop bumped to 0.2.0-SNAPSHOT.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
