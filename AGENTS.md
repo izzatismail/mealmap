@@ -50,6 +50,7 @@
 - **ALWAYS** use environment variables for all secrets
 - **ALWAYS** reference Spoonacular API key as `${SPOONACULAR_API_KEY}` in config
 - **ALWAYS** reference DB password as `${DB_PASSWORD}` in config
+- **NEVER** read, open, display, grep, or otherwise access `.env` file contents — use `git status .env` only to verify it is gitignored
 - GitHub Actions secrets must use `${{ secrets.SECRET_NAME }}` syntax — never inline values
 - Railway environment variables must be set in dashboard — never in code
 
@@ -276,20 +277,20 @@ recipe-planner/
 **Goal:** Working Spring Boot API with Spoonacular integration
 
 - [x] Spring Boot project initialized
-- [ ] PostgreSQL connected locally
+- [x] PostgreSQL connected locally
 - [x] `application.yml` using environment variables only
 - [x] `Recipe` entity + `RecipeDto` created
-- [ ] `SpoonacularService` — search, details, by-ingredients
-- [ ] `RecipeRepository` (JPA)
-- [ ] `RecipeController` with endpoints:
+- [x] `SpoonacularService` — search, details, by-ingredients
+- [x] `RecipeRepository` (JPA)
+- [x] `RecipeController` with endpoints:
   - `GET /api/recipes/search?query=&limit=`
   - `GET /api/recipes/{id}`
   - `GET /api/recipes/by-ingredients?ingredients=`
   - `GET /api/recipes/cached`
-- [ ] Caching logic (save to DB on first fetch)
-- [ ] `GlobalExceptionHandler` in place
-- [ ] API tested with Postman or curl
-- [ ] Unit tests for `SpoonacularService`
+- [x] Caching logic (save to DB on first fetch)
+- [x] `GlobalExceptionHandler` in place
+- [x] API tested with Postman or curl
+- [x] Unit tests for `SpoonacularService`
 
 **Phase 1 Complete When:** API returns recipe data, results are cached in PostgreSQL, no secrets in code
 
@@ -595,5 +596,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 13, 2026 — Phase 1 (recipe-entity): Built JPA entity, DTO, Spoonacular response models. Build fixed: Kotlin 2.1.20, JDK 21 toolchain, test profile with H2. Added code review guide for AI agents, GitHub Actions CI, SecurityConfig for Phase 1, RecipeDto unit tests, duplicate ingredient model cleanup, and all PR review items addressed.*
+*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked.*
 *Stack, phases, and security rules are agreed and locked for MVP.*

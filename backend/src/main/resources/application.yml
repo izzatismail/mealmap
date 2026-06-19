@@ -2,7 +2,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/mealmap}
     username: ${DB_USERNAME:mealmap}
-    password: ${DB_PASSWORD}
+    password: ${DB_PASSWORD:mealmap}
   jpa:
     hibernate:
       ddl-auto: update
