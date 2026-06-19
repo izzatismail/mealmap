@@ -546,6 +546,47 @@ Before creating any MR, the AI Agent MUST run a **security compliance check** ag
 
 - §10.3 ("NEVER open PRs targeting `main` or `develop`") applies to **autonomous** agent action. When the developer explicitly requests an MR, the agent must first present the full draft and pre-MR security check results, then wait for confirmation before executing.
 
+### 10.7 Versioning & Release Tags
+
+```
+Versioning:      SemVer (MAJOR.MINOR.PATCH)
+Phase mapping:   v0.1.0 → Phase 1, v0.2.0 → Phase 2, v1.0.0 → Phase 6 (MVP)
+```
+
+| Branch | `build.gradle.kts` version | Meaning |
+|--------|---------------------------|---------|
+| `main` | `0.1.0` (no `-SNAPSHOT`) | Current release |
+| `develop` | `0.2.0-SNAPSHOT` | Work in progress toward next release |
+
+**Release Workflow** (performed by developer after Phase PR is merged to `main`):
+
+```bash
+# 1. Checkout main and pull
+git checkout main && git pull origin main
+
+# 2. Bump version to release (e.g., 0.1.0)
+# Edit backend/build.gradle.kts: version = "0.1.0"
+git commit -m "chore(release): bump version to 0.1.0"
+git push origin main
+
+# 3. Tag the release
+git tag -a v0.1.0 -m "Phase 1: Backend Foundation"
+git push origin v0.1.0
+
+# 4. Bump develop for next cycle
+git checkout develop
+# Edit backend/build.gradle.kts: version = "0.2.0-SNAPSHOT"
+git commit -m "chore(release): prepare next development iteration 0.2.0-SNAPSHOT"
+git push origin develop
+```
+
+**Rules:**
+- ✅ **ALWAYS** bump version in `build.gradle.kts` to match git tag
+- ✅ `main` version must match the latest tag (no `-SNAPSHOT`)
+- ✅ `develop` version must point to next planned release with `-SNAPSHOT`
+- ⛔ **NEVER** push `-SNAPSHOT` versions to `main`
+- ⛔ **NEVER** tag a commit without bumping the build version first
+
 ---
 
 ## 11. Code Review Guide for AI Agents
@@ -596,5 +637,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked.*
+*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked. Added §10.7 Versioning & Release Tags.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
