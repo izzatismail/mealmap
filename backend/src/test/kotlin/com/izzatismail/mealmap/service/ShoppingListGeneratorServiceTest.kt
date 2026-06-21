@@ -14,6 +14,7 @@ import com.izzatismail.mealmap.repository.ShoppingListRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -76,7 +77,7 @@ class ShoppingListGeneratorServiceTest {
         )
         mealPlan.plannedMeals.add(plannedMeal)
 
-        whenever(mealPlanRepository.findById(1L)).thenReturn(Optional.of(mealPlan))
+        whenever(mealPlanRepository.findByIdWithPlannedMeals(1L)).thenReturn(mealPlan)
         whenever(shoppingListRepository.findByMealPlanId(1L)).thenReturn(null)
         whenever(shoppingListRepository.save(any<ShoppingList>())).thenAnswer { it.arguments[0] as ShoppingList }
 
@@ -91,11 +92,11 @@ class ShoppingListGeneratorServiceTest {
 
     @Test
     fun `generateShoppingList returns existing list when already generated`() {
-        val user = User(id = 1L, email = "test@test.com", password = "hashed")
+        val user = User(id = 1L, email = "[EMAIL]", password = "hashed")
         val mealPlan = MealPlan(id = 1L, user = user, weekStart = LocalDate.now(), weekEnd = LocalDate.now().plusDays(7))
         val existing = ShoppingList(id = 1L, mealPlan = mealPlan, user = user)
 
-        whenever(mealPlanRepository.findById(1L)).thenReturn(Optional.of(mealPlan))
+        whenever(mealPlanRepository.findByIdWithPlannedMeals(1L)).thenReturn(mealPlan)
         whenever(shoppingListRepository.findByMealPlanId(1L)).thenReturn(existing)
 
         val result = generatorService.generateShoppingList(1L)
@@ -130,7 +131,7 @@ class ShoppingListGeneratorServiceTest {
         mealPlan.plannedMeals.add(PlannedMeal(mealPlan = mealPlan, recipe = recipe1, mealType = MealType.DINNER, dayOfWeek = 1, servings = 2))
         mealPlan.plannedMeals.add(PlannedMeal(mealPlan = mealPlan, recipe = recipe2, mealType = MealType.LUNCH, dayOfWeek = 2, servings = 2))
 
-        whenever(mealPlanRepository.findById(1L)).thenReturn(Optional.of(mealPlan))
+        whenever(mealPlanRepository.findByIdWithPlannedMeals(1L)).thenReturn(mealPlan)
         whenever(shoppingListRepository.findByMealPlanId(1L)).thenReturn(null)
         whenever(shoppingListRepository.save(any<ShoppingList>())).thenAnswer { it.arguments[0] as ShoppingList }
 
@@ -163,16 +164,17 @@ class ShoppingListGeneratorServiceTest {
             PantryItem(user = user, name = "Egg", amount = 4.0, unit = "pieces"),
         )
 
-        whenever(mealPlanRepository.findById(1L)).thenReturn(Optional.of(mealPlan))
+        whenever(mealPlanRepository.findByIdWithPlannedMeals(1L)).thenReturn(mealPlan)
         whenever(shoppingListRepository.findByMealPlanId(1L)).thenReturn(null)
         whenever(pantryItemRepository.findByUserId(1L)).thenReturn(pantryItems)
         whenever(shoppingListRepository.save(any<ShoppingList>())).thenAnswer { it.arguments[0] as ShoppingList }
 
-        val result = generatorService.generateShoppingList(1L, userId = 1L)
+        val result = generatorService.generateShoppingList(1L)
 
         assertEquals(1, result.items.size)
         assertEquals(100.0, result.items.first().amount)
         assertEquals("Pasta", result.items.first().name)
+        assertNull(result.items.find { it.name == "Egg" })
     }
 
     @Test
@@ -192,12 +194,12 @@ class ShoppingListGeneratorServiceTest {
 
         val pantryItems = listOf(PantryItem(user = user, name = "Egg", amount = 6.0, unit = "pieces"))
 
-        whenever(mealPlanRepository.findById(1L)).thenReturn(Optional.of(mealPlan))
+        whenever(mealPlanRepository.findByIdWithPlannedMeals(1L)).thenReturn(mealPlan)
         whenever(shoppingListRepository.findByMealPlanId(1L)).thenReturn(null)
         whenever(pantryItemRepository.findByUserId(1L)).thenReturn(pantryItems)
         whenever(shoppingListRepository.save(any<ShoppingList>())).thenAnswer { it.arguments[0] as ShoppingList }
 
-        val result = generatorService.generateShoppingList(1L, userId = 1L)
+        val result = generatorService.generateShoppingList(1L)
 
         assertTrue(result.items.isEmpty())
     }

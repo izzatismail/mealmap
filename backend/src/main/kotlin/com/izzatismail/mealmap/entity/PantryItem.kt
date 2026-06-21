@@ -31,10 +31,10 @@ class PantryItem(
     val name: String,
 
     @Column(nullable = false)
-    val amount: Double,
+    var amount: Double,
 
     @Column(nullable = false)
-    val unit: String,
+    var unit: String,
 
     @Column(name = "expiration_date")
     val expirationDate: LocalDate? = null,
