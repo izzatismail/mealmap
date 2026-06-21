@@ -300,17 +300,17 @@ recipe-planner/
 
 **Goal:** Full data model + shopping list algorithm
 
-- [ ] `User` entity (no plain text passwords)
-- [ ] `MealPlan` entity
-- [ ] `PlannedMeal` entity
-- [ ] `ShoppingList` entity
-- [ ] `ShoppingItem` entity
-- [ ] `Ingredient` entity
-- [ ] `ShoppingListGeneratorService` (combine + normalize ingredients from meal plan)
-- [ ] `PantryItem` entity + service
-- [ ] All relationships defined (OneToMany, ManyToMany)
-- [ ] `ddl-auto: update` confirmed for local dev
-- [ ] Unit tests for `ShoppingListGeneratorService`
+- [x] `User` entity (no plain text passwords)
+- [x] `MealPlan` entity
+- [x] `PlannedMeal` entity
+- [x] `ShoppingList` entity
+- [x] `ShoppingItem` entity
+- [x] `Ingredient` entity
+- [x] `ShoppingListGeneratorService` (combine + normalize ingredients from meal plan)
+- [x] `PantryItem` entity + service
+- [x] All relationships defined (OneToMany, ManyToMany)
+- [x] `ddl-auto: update` confirmed for local dev
+- [x] Unit tests for `ShoppingListGeneratorService`
 
 **Phase 2 Complete When:** Full data model migrated, shopping list generates from a mock meal plan
 
@@ -637,5 +637,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked. Added §10.7 Versioning & Release Tags. Released v0.1.0. Develop bumped to 0.2.0-SNAPSHOT.*
+*Last updated: Jun 21, 2026 — Phase 2 complete: 7 JPA entities (User, Ingredient, MealPlan, PlannedMeal, ShoppingList, ShoppingItem, PantryItem) with full relationships, 7 repositories, 7 DTOs, ShoppingListGeneratorService (ingredient aggregation + pantry subtraction), PantryService (CRUD), 5 unit tests. All Phase 2 items checked. Phase 3 docker-compose verification and CI pipeline still pending.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
