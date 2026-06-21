@@ -33,9 +33,9 @@ class ShoppingListGeneratorService(
         val category: String,
     )
 
-    fun generateShoppingList(mealPlanId: Long, userId: Long? = null): ShoppingListDto {
-        val mealPlan = mealPlanRepository.findById(mealPlanId)
-            .orElseThrow { ResourceNotFoundException("Meal plan not found with id: $mealPlanId") }
+    fun generateShoppingList(mealPlanId: Long): ShoppingListDto {
+        val mealPlan = mealPlanRepository.findByIdWithPlannedMeals(mealPlanId)
+            ?: throw ResourceNotFoundException("Meal plan not found with id: $mealPlanId")
 
         val existing = shoppingListRepository.findByMealPlanId(mealPlanId)
         if (existing != null) {
@@ -49,9 +49,7 @@ class ShoppingListGeneratorService(
 
         val aggregated = aggregateIngredients(ingredients)
 
-        val adjusted = if (userId != null) {
-            subtractPantryItems(aggregated, userId)
-        } else aggregated
+        val adjusted = subtractPantryItems(aggregated, mealPlan.user.id)
 
         val shoppingList = ShoppingList(
             mealPlan = mealPlan,
@@ -111,7 +109,7 @@ class ShoppingListGeneratorService(
         aggregated: List<AggregatedIngredient>,
         userId: Long,
     ): List<AggregatedIngredient> {
-        val pantryItems = pantryItemRepository.findByUserId(userId)
+        val pantryItems = pantryItemRepository.findByUserId(userId) ?: emptyList()
         if (pantryItems.isEmpty()) return aggregated
 
         return aggregated.map { agg ->

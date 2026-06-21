@@ -36,17 +36,9 @@ class PantryService(
         val item = pantryItemRepository.findById(id)
             .orElseThrow { ResourceNotFoundException("Pantry item not found with id: $id") }
 
-        val updated = PantryItem(
-            id = item.id,
-            user = item.user,
-            ingredient = item.ingredient,
-            name = item.name,
-            amount = amount,
-            unit = unit,
-            expirationDate = item.expirationDate,
-            addedAt = item.addedAt,
-        )
-        return pantryItemRepository.save(updated).toDto()
+        item.amount = amount
+        item.unit = unit
+        return pantryItemRepository.save(item).toDto()
     }
 
     fun deletePantryItem(id: Long) {
