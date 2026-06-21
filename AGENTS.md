@@ -300,17 +300,17 @@ recipe-planner/
 
 **Goal:** Full data model + shopping list algorithm
 
-- [ ] `User` entity (no plain text passwords)
-- [ ] `MealPlan` entity
-- [ ] `PlannedMeal` entity
-- [ ] `ShoppingList` entity
-- [ ] `ShoppingItem` entity
-- [ ] `Ingredient` entity
-- [ ] `ShoppingListGeneratorService` (combine + normalize ingredients from meal plan)
-- [ ] `PantryItem` entity + service
-- [ ] All relationships defined (OneToMany, ManyToMany)
-- [ ] `ddl-auto: update` confirmed for local dev
-- [ ] Unit tests for `ShoppingListGeneratorService`
+- [x] `User` entity (no plain text passwords)
+- [x] `MealPlan` entity
+- [x] `PlannedMeal` entity
+- [x] `ShoppingList` entity
+- [x] `ShoppingItem` entity
+- [x] `Ingredient` entity
+- [x] `ShoppingListGeneratorService` (combine + normalize ingredients from meal plan)
+- [x] `PantryItem` entity + service
+- [x] All relationships defined (OneToMany, ManyToMany)
+- [x] `ddl-auto: update` confirmed for local dev
+- [x] Unit tests for `ShoppingListGeneratorService`
 
 **Phase 2 Complete When:** Full data model migrated, shopping list generates from a mock meal plan
 
@@ -555,28 +555,28 @@ Phase mapping:   v0.1.0 → Phase 1, v0.2.0 → Phase 2, v1.0.0 → Phase 6 (MVP
 
 | Branch | `build.gradle.kts` version | Meaning |
 |--------|---------------------------|---------|
-| `main` | `0.1.0` (no `-SNAPSHOT`) | Current release |
-| `develop` | `0.2.0-SNAPSHOT` | Work in progress toward next release |
+| `main` | `0.2.0` (no `-SNAPSHOT`) | Current release |
+| `develop` | `0.3.0-SNAPSHOT` | Work in progress toward next release |
 
-**Release Workflow** (performed by developer after Phase PR is merged to `main`):
+**Release Workflow** (version bump happens in the PR, not after merge):
 
 ```bash
-# 1. Checkout main and pull
+# 1. Bump version to release (e.g., 0.2.0) on develop BEFORE creating the PR
+# Edit backend/build.gradle.kts: version = "0.2.0"
+git commit -m "chore(release): bump version to 0.2.0"
+
+# 2. Create PR from develop to main and merge
+# (version is already correct in the merge commit)
+
+# 3. Tag the merge commit on main
 git checkout main && git pull origin main
-
-# 2. Bump version to release (e.g., 0.1.0)
-# Edit backend/build.gradle.kts: version = "0.1.0"
-git commit -m "chore(release): bump version to 0.1.0"
-git push origin main
-
-# 3. Tag the release
-git tag -a v0.1.0 -m "Phase 1: Backend Foundation"
-git push origin v0.1.0
+git tag -a v0.2.0 -m "Phase 2: Database & Core Services"
+git push origin v0.2.0
 
 # 4. Bump develop for next cycle
 git checkout develop
-# Edit backend/build.gradle.kts: version = "0.2.0-SNAPSHOT"
-git commit -m "chore(release): prepare next development iteration 0.2.0-SNAPSHOT"
+# Edit backend/build.gradle.kts: version = "0.3.0-SNAPSHOT"
+git commit -m "chore(release): prepare next development iteration 0.3.0-SNAPSHOT"
 git push origin develop
 ```
 
@@ -637,5 +637,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 19, 2026 — Phase 1 complete: RecipeRepository, SpoonacularService (cache-first, Spoonacular-on-miss), RecipeController (4 endpoints), GlobalExceptionHandler, Unit tests (8 tests), Docker build fix (JDK builder image), Docker compose verified. All Phase 1 items checked. Added §10.7 Versioning & Release Tags.*
+*Last updated: Jun 21, 2026 — Phase 2 complete: 7 JPA entities (User, Ingredient, MealPlan, PlannedMeal, ShoppingList, ShoppingItem, PantryItem) with full relationships, 7 repositories, 7 DTOs, ShoppingListGeneratorService (ingredient aggregation + pantry subtraction), PantryService (CRUD), 5 unit tests. All Phase 2 items checked. Phase 3 docker-compose verification and CI pipeline still pending.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
