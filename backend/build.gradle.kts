@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
 	kotlin("jvm") version "2.1.20"
 	kotlin("plugin.spring") version "2.1.20"
@@ -7,7 +9,7 @@ plugins {
 }
 
 group = "com.izzatismail"
-version = "0.2.0"
+version = "0.3.0"
 
 java {
 	toolchain {
@@ -46,4 +48,12 @@ tasks.withType<Test> {
 	testLogging {
 		events("passed", "failed", "skipped")
 	}
+}
+
+tasks.named<Jar>("jar") {
+	enabled = false
+}
+
+tasks.named<BootJar>("bootJar") {
+	archiveFileName.set("app.jar")
 }
