@@ -10,5 +10,5 @@ FROM eclipse-temurin:21-jre
 RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 USER appuser
 WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/build/libs/app.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

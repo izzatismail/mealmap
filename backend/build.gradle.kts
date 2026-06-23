@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
 	kotlin("jvm") version "2.1.20"
 	kotlin("plugin.spring") version "2.1.20"
@@ -46,4 +48,12 @@ tasks.withType<Test> {
 	testLogging {
 		events("passed", "failed", "skipped")
 	}
+}
+
+tasks.named<Jar>("jar") {
+	enabled = false
+}
+
+tasks.named<BootJar>("bootJar") {
+	archiveFileName.set("app.jar")
 }
