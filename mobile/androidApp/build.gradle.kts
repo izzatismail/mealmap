@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.sharedUI)
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.koin.android)
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
@@ -28,8 +29,13 @@ android {
         applicationId = "com.izzatismail.mealmap"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 4
+        versionName = "0.4.0"
+
+        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080\"")
+    }
+    buildFeatures {
+        buildConfig = true
     }
     packaging {
         resources {
@@ -37,8 +43,15 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
+        debug {
             isMinifyEnabled = false
+        }
+        release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {

@@ -9,6 +9,7 @@ build/
 .gradle/
 *.jar
 !backend/gradle/wrapper/gradle-wrapper.jar
+!mobile/gradle/wrapper/gradle-wrapper.jar
 *.class
 
 # IDE
@@ -18,3 +19,11 @@ build/
 
 # Docker
 docker-compose.override.yml
+
+# Mobile
+*.apk
+*.aab
+*.jks
+*.keystore
+iosApp/*.xcworkspace/xcuserdata/
+iosApp/DerivedData/

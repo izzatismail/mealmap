@@ -623,7 +623,202 @@ For every finding:
 
 ---
 
-## 12. Session Start Checklist for AI Agent
+## 12. Design System
+
+> ⚠️ **AI AGENT:** All mobile UI must follow this design system exactly.
+> Do not introduce new colors, fonts, or spacing values not listed here.
+> When building Compose or SwiftUI screens, derive every visual decision from these tokens.
+
+### 12.1 Visual Identity
+
+> *"A sun-warmed Mediterranean kitchen — soft, muted, and calming.
+> Like a beautifully designed recipe journal you actually want to open every morning."*
+
+- **Style:** Warm & inviting, Modern Mediterranean
+- **Mode:** Light only — no dark mode for MVP
+- **Personality:** Soft, friendly, approachable — not clinical, not loud
+
+---
+
+### 12.2 Color Tokens
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `colorBg` | `#F5F2ED` | App background (warm off-white / linen) |
+| `colorSurface` | `#EDEAE4` | Cards, bottom sheets, input backgrounds |
+| `colorSurfaceHover` | `#E5E1DA` | Pressed/hover state for surfaces |
+| `colorPrimary` | `#7A9E7E` | Dusty sage green — primary actions, active states |
+| `colorPrimaryLight` | `#EAF0EA` | Chip backgrounds, icon backgrounds, highlights |
+| `colorAccent` | `#8FA8C8` | Faded Mediterranean blue — secondary highlights |
+| `colorAccentLight` | `#EAF0F5` | Accent chip backgrounds |
+| `colorTextPrimary` | `#2D2D2D` | Headings, body text |
+| `colorTextSecondary` | `#8A8680` | Subtitles, metadata, labels |
+| `colorTextTertiary` | `#B5B0AA` | Placeholders, inactive tab labels |
+| `colorError` | `#C97B6A` | Muted terracotta — errors, low stock warnings |
+| `colorErrorLight` | `#F8EDE9` | Error chip/card backgrounds |
+| `colorBorder` | `#E0DBD4` | Dividers, input borders |
+| `colorWhite` | `#FFFFFF` | Card surfaces, bottom nav bar |
+| `colorShadow` | `rgba(60,50,40,0.09)` | Card shadows |
+
+**Rules:**
+- Never introduce a color not in this table without developer approval
+- Never use pure `#000000` or `#FFFFFF` for text — use `colorTextPrimary` and `colorBg`
+- Semantic colors (`colorError`, `colorPrimary`) carry meaning — don't reuse decoratively
+
+---
+
+### 12.3 Typography
+
+**Font Family:** `Nunito` (Google Fonts — free, rounded, friendly)
+
+| Role | Weight | Size | Usage |
+|------|--------|------|-------|
+| Display | Bold 800 | 24sp | Screen titles, greeting text |
+| Headline | ExtraBold 800 | 22sp | Section titles |
+| Title | Bold 700 | 18sp | Card titles, recipe names (large) |
+| Body Large | SemiBold 600 | 16sp | Recipe names (cards), primary content |
+| Body | Regular 400 | 14sp | Ingredients, instructions, descriptions |
+| Label | Bold 700 | 13sp | Filter chips, button text, tab labels |
+| Caption | Regular 400 | 12sp | Metadata (time, servings, calories) |
+| Micro | Bold 700 | 11sp | Tags, meal type labels (uppercase) |
+
+**Rules:**
+- Always use `Nunito` — never substitute another font
+- Meal type labels (Breakfast, Lunch, Dinner) use Micro style + `textTransform: uppercase` + `letterSpacing: 0.8`
+- Never use font sizes below 11sp
+
+---
+
+### 12.4 Spacing & Grid
+
+**Base unit:** `8dp`
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `spacingXS` | 4dp | Gap between chips/tags |
+| `spacingS` | 8dp | Small internal padding |
+| `spacingM` | 12dp | Card inner padding (compact) |
+| `spacingL` | 16dp | Screen edge padding, card inner padding |
+| `spacingXL` | 24dp | Section gaps |
+| `spacingXXL` | 32dp | Large section separators |
+
+---
+
+### 12.5 Shape & Radius
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `radiusCard` | 20dp | All recipe cards, meal slots, status cards |
+| `radiusButton` | 12dp | Primary/secondary buttons |
+| `radiusChip` | 20dp | Filter chips, dietary tags (pill shape) |
+| `radiusImage` | 16dp | Recipe card images (top corners only) |
+| `radiusSmall` | 8dp | Small containers, icon backgrounds |
+| `radiusInput` | 12dp | Search bars, text inputs |
+
+---
+
+### 12.6 Shadows
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `shadowCard` | `0px 4px 16px rgba(60,50,40,0.09)` | Recipe cards, suggestion cards |
+| `shadowSmall` | `0px 2px 8px rgba(60,50,40,0.06)` | Dashboard status cards, meal slots |
+| `shadowNav` | `0px -4px 16px rgba(60,50,40,0.09)` | Bottom navigation bar |
+
+---
+
+### 12.7 Navigation Pattern
+
+- **Pattern:** Home Dashboard as first screen
+- **Nav type:** Bottom tab bar (always visible, 5 tabs)
+- **Tab order:** Home · Recipes · Planner · Shopping · Pantry
+- **Active state:** `colorPrimary` label + filled icon + small dot indicator below icon
+- **Inactive state:** `colorTextTertiary` label + outlined/greyscale icon
+- **Tab bar background:** `colorWhite` with `shadowNav`
+
+---
+
+### 12.8 Home Dashboard Layout
+
+```
+┌─────────────────────────────┐
+│  Good morning 👋            │  ← Greeting (colorTextSecondary, 13sp)
+│  What's cooking today?      │  ← Display bold (colorTextPrimary, 24sp)
+├─────────────────────────────┤
+│  THIS WEEK          Full → │  ← Section header
+│  [Mon] [Tue] [Wed] [Thu]   │  ← Day strip, active = colorPrimary circle
+│  [Fri] [Sat] [Sun]         │
+├─────────────────────────────┤
+│  TODAY'S MEALS        Edit │  ← Section header
+│  [🥣 Breakfast Card]       │
+│  [🥗 Lunch Card]           │  ← MealSlot cards (colorWhite, shadowSmall)
+│  [🍋 Dinner Card]          │
+├─────────────────────────────┤
+│  PANTRY & SHOPPING  View → │  ← Section header
+│  [🫙 3 low] [🛒 8] [✅ 24]│  ← Status cards row (3 equal width)
+├─────────────────────────────┤
+│  TRY SOMETHING NEW  More → │  ← Section header
+│  [Large Recipe Card]        │  ← Full-width, large card
+├─────────────────────────────┤
+│  QUICK & EASY       More → │  ← Section header
+│  → Horizontal scroll cards  │  ← 200dp wide cards, horizontal scroll
+└─────────────────────────────┘
+```
+
+---
+
+### 12.9 Recipe Card Specs
+
+| Property | Value |
+|----------|-------|
+| Corner radius | 20dp |
+| Shadow | `shadowCard` |
+| Image height (large) | 180dp |
+| Image height (compact) | 130dp |
+| Min width (compact) | 200dp |
+| Background | `colorWhite` |
+| Press animation | Scale to 0.97, spring curve, 180ms |
+| Calorie badge | Top-right of image, white bg 85% opacity, 20dp pill |
+| Tag chips | `colorPrimaryLight` bg, `colorPrimary` text |
+
+---
+
+### 12.10 Imagery
+
+| Property | Value |
+|----------|-------|
+| Style | Large, rounded, warm-toned food photography |
+| Aspect ratio | 16:9 for cards, 4:3 for detail screens |
+| Placeholder | `colorPrimaryLight` gradient + fork icon |
+| Loading | Shimmer effect matching card shape |
+| Radius | Top corners only on cards (16dp), full on detail |
+
+---
+
+### 12.11 Design Reference
+
+- **Prototype file:** `mealmap-prototype.jsx` (interactive React mockup)
+- Run the prototype to see all tokens applied visually before building screens
+- All design decisions in the prototype are canonical — match them exactly in Compose/SwiftUI
+
+---
+
+### 12.12 Design Rules for AI Agent
+
+- ✅ Always use `Nunito` font
+- ✅ Always use tokens from Section 11.2 — never raw hex values in code
+- ✅ Always apply `radiusCard` (20dp) to recipe cards
+- ✅ Always apply `shadowCard` to elevated surfaces
+- ✅ Screen edge padding is always `spacingL` (16dp)
+- ✅ Section gaps are always `spacingXL` (24dp)
+- ❌ Never introduce dark mode styles
+- ❌ Never use pure black or white for text/backgrounds
+- ❌ Never use fonts other than Nunito
+- ❌ Never add decorative elements not in the prototype
+
+---
+
+## 13. Session Start Checklist for AI Agent
 
 At the start of every session, confirm:
 
