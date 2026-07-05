@@ -2,10 +2,7 @@ import SwiftUI
 import SharedLogic
 
 class RecipeViewModelWrapper: ObservableObject {
-    private let repository = RecipeRepository(
-        api: MealMapApi(httpClient: HttpClientFactory.shared.create()),
-        database: nil
-    )
+    private let repository: RecipeRepository
     private let viewModel: RecipeViewModel
 
     @Published var recipes: [Recipe] = []
@@ -18,6 +15,7 @@ class RecipeViewModelWrapper: ObservableObject {
     @Published var detailError: String? = nil
 
     init() {
+        self.repository = IosKoinInitializer.companion.provideRecipeRepository()
         self.viewModel = RecipeViewModel(repository: repository)
     }
 

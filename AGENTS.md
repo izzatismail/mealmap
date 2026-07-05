@@ -344,21 +344,23 @@ recipe-planner/
 **Goal:** Both platforms browse recipes from backend API
 
 - [x] KMP project initialized
-- [ ] Shared module structure set up
-- [ ] Shared: `Recipe`, `MealPlan`, `ShoppingItem` models
-- [ ] Shared: Ktor Client configured (HTTPS only)
-- [ ] Shared: `RecipeRepository` (network + local cache)
-- [ ] Shared: `RecipeViewModel`
-- [ ] Android: Recipe list screen (Compose)
-- [ ] Android: Recipe detail screen (Compose)
-- [ ] Android: Navigation
-- [ ] Android: Coil image loading
-- [ ] Android: Room local caching
-- [ ] iOS: Mirror screens in SwiftUI
-- [ ] iOS: Local SQLite caching
+- [x] Shared module structure set up
+- [x] Shared: `Recipe`, `SpoonacularIngredient` models
+- [x] Shared: Ktor Client configured (HTTPS only)
+- [x] Shared: `RecipeRepository` (network + local cache)
+- [x] Shared: `RecipeViewModel`
+- [x] Android: Recipe list screen (Compose)
+- [x] Android: Recipe detail screen (Compose)
+- [x] Android: Navigation
+- [x] Android: Coil image loading
+- [x] Android: SQLDelight local caching
+- [x] iOS: Mirror screens in SwiftUI
+- [x] iOS: Local SQLite caching (SQLDelight)
 - [ ] JWT token stored securely (Keystore / Keychain)
-- [ ] Base URL in build config (not hardcoded)
-- [ ] No sensitive data in logs
+- [x] Base URL in build config (not hardcoded)
+- [x] No sensitive data in logs
+- [x] Nunito font files bundled in compose resources
+- [x] Design system implemented (colors, typography, shapes)
 
 **Phase 4 Complete When:** Both platforms fetch and display real recipe data
 
@@ -531,16 +533,21 @@ Every MR/PR must follow this structure — AI Agent must present the full draft 
 
 ### 10.5 Pre-MR Checklist
 
-Before creating any MR, the AI Agent MUST run a **security compliance check** against §3 (Non-Negotiable Security Rules):
+Before creating any MR or marking a task complete, the AI Agent MUST:
 
-1. Scan all new/changed files for hardcoded secrets, API keys, passwords
-2. Verify `.env`/secrets files are not committed (`.gitignore` check)
-3. Verify no plaintext passwords or tokens in source code
-4. Verify `@Valid`/`@Validated` on controller params where applicable
-5. Verify JWT validation on protected endpoints where applicable
-6. Verify no wildcard CORS in production config where applicable
-7. Summarize findings in the MR's **Security Review** section
-8. If any **Critical** or **High** severity finding exists, **block the MR** and flag to the developer
+**Build verification:**
+1. Run `./gradlew :androidApp:compileDebugKotlin` — Android must compile without errors
+2. Run `./gradlew :sharedLogic:compileKotlinIosSimulatorArm64` — iOS shared logic must compile without errors
+
+**Security compliance check against §3 (Non-Negotiable Security Rules):**
+3. Scan all new/changed files for hardcoded secrets, API keys, passwords
+4. Verify `.env`/secrets files are not committed (`.gitignore` check)
+5. Verify no plaintext passwords or tokens in source code
+6. Verify `@Valid`/`@Validated` on controller params where applicable
+7. Verify JWT validation on protected endpoints where applicable
+8. Verify no wildcard CORS in production config where applicable
+9. Summarize findings in the MR's **Security Review** section
+10. If any **Critical** or **High** severity finding exists, **block the MR** and flag to the developer
 
 ### 10.6 AI Agent Rule Clarification
 
