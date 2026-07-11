@@ -1,16 +1,21 @@
 package com.izzatismail.mealmap
 
 import com.izzatismail.mealmap.api.ApiConfig
+import com.izzatismail.mealmap.api.IosTokenProvider
+import com.izzatismail.mealmap.api.TokenProvider
 import com.izzatismail.mealmap.di.sharedModule
 import com.izzatismail.mealmap.repository.RecipeRepository
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 class IosKoinInitializer {
     fun setupKoin(baseUrl: String) {
         ApiConfig.baseUrl = baseUrl
         koinInstance = startKoin {
-            modules(sharedModule)
+            modules(sharedModule + module {
+                single<TokenProvider> { IosTokenProvider() }
+            })
         }.koin
     }
 
