@@ -371,14 +371,14 @@ recipe-planner/
 **Goal:** Full working MVP — auth, meal planning, shopping lists, pantry
 
 **Backend:**
-- [ ] User registration + login (JWT, BCrypt passwords)
-- [ ] Protected endpoints with Spring Security
-- [ ] Favorite recipes endpoints
-- [ ] Meal plan CRUD
-- [ ] Shopping list generation endpoint
-- [ ] Pantry management CRUD
-- [ ] CORS configured explicitly (no wildcard)
-- [ ] Integration tests for auth endpoints
+- [x] User registration + login (JWT, BCrypt passwords)
+- [x] Protected endpoints with Spring Security
+- [x] Favorite recipes endpoints
+- [x] Meal plan CRUD
+- [x] Shopping list generation endpoint
+- [x] Pantry management CRUD
+- [x] CORS configured explicitly (no wildcard)
+- [x] Integration tests for auth endpoints
 
 **Mobile:**
 - [ ] Login / Registration screens
@@ -839,5 +839,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jun 23, 2026 — Phase 2 complete. Phase 3: Dockerfile and docker-compose.yml created. docker-compose up verified — PostgreSQL connects, backend starts, API reachable at localhost:8080. CI pipeline passes pending PR merge.*
+*Last updated: Jul 11, 2026 — Phase 5 backend complete. Auth (JWT, BCrypt, register/login), favorites, meal plan CRUD, shopping list generation, pantry CRUD, CORS, integration tests all implemented. Next: Phase 5 mobile UI.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
