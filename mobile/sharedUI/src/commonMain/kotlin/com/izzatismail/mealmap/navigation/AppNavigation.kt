@@ -27,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.izzatismail.mealmap.screens.FavoritesScreen
 import com.izzatismail.mealmap.screens.HomeScreen
 import com.izzatismail.mealmap.screens.LoginScreen
 import com.izzatismail.mealmap.screens.PantryScreen
@@ -174,13 +175,20 @@ fun MainTabs(
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
             composable<Screen.Home> {
-                HomeScreen(onNavigateToRecipes = { selectedTab = 1 })
+                HomeScreen(
+                    onNavigateToRecipes = { selectedTab = 1 },
+                    onRecipeClick = onRecipeClick,
+                )
             }
             composable<Screen.RecipeList> {
-                RecipeListScreen(onRecipeClick = onRecipeClick)
+                RecipeListScreen(
+                    onRecipeClick = { recipeId ->
+                        onRecipeClick(recipeId)
+                    },
+                )
             }
             composable<Screen.Planner> {
-                PlannerScreen()
+                PlannerScreen(onRecipeClick = onRecipeClick)
             }
             composable<Screen.ShoppingList> {
                 ShoppingListScreen()

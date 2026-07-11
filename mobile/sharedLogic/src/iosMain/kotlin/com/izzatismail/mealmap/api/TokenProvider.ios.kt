@@ -1,89 +1,39 @@
 package com.izzatismail.mealmap.api
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import platform.CoreFoundation.*
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
-import platform.Security.*
+import platform.Foundation.NSUserDefaults
 
-@OptIn(ExperimentalForeignApi::class)
+/**
+ * iOS TokenProvider using NSUserDefaults for MVP.
+ *
+ * NOTE: For production, replace with Keychain via a Swift helper exposed to Kotlin/Native.
+ * See: https://developer.apple.com/documentation/security/keychain_services
+ * Kotlin 2.4.0 cinterop changes make direct CFDictionary construction unreliable.
+ * Solution: Write a small Swift helper in iosApp/ and expose via @ObjCName.
+ */
 class IosTokenProvider : TokenProvider {
     private var cachedToken: String? = null
 
     override suspend fun getToken(): String? {
         if (cachedToken != null) return cachedToken
-        cachedToken = readFromKeychain()
+        cachedToken = NSUserDefaults.standardUserDefaults.stringForKey(KEY)
         return cachedToken
     }
 
     override suspend fun saveToken(token: String) {
         cachedToken = token
-        saveToKeychain(token)
+        NSUserDefaults.standardUserDefaults.setObject(token, forKey = KEY)
+        NSUserDefaults.standardUserDefaults.synchronize()
     }
 
     override suspend fun clearToken() {
         cachedToken = null
-        deleteFromKeychain()
+        NSUserDefaults.standardUserDefaults.removeObjectForKey(KEY)
+        NSUserDefaults.standardUserDefaults.synchronize()
     }
 
     override suspend fun hasToken(): Boolean = getToken() != null
 
-    private fun readFromKeychain(): String? {
-        val query = mapOf<Any?, Any?>(
-            kSecClass to kSecClassGenericPassword,
-            kSecAttrAccount to SERVICE_NAME,
-            kSecReturnData to true,
-            kSecMatchLimit to kSecMatchLimitOne,
-        )
-
-        memScoped {
-            val result = alloc<CFTypeRefVar>()
-            val status = SecItemCopyMatching(query.toCFDictionary(), result.ptr)
-            if (status == errSecSuccess) {
-                val data = result.value
-                if (data != null) {
-                    return NSString.create(data, encoding = NSUTF8StringEncoding) as? String
-                }
-            }
-        }
-        return null
-    }
-
-    private fun saveToKeychain(token: String) {
-        deleteFromKeychain()
-        val data = (token as NSString).dataUsingEncoding(NSUTF8StringEncoding) ?: return
-        val query = mapOf<Any?, Any?>(
-            kSecClass to kSecClassGenericPassword,
-            kSecAttrAccount to SERVICE_NAME,
-            kSecValueData to data,
-            kSecAttrAccessible to kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-        )
-
-        SecItemAdd(query.toCFDictionary(), null)
-    }
-
-    private fun deleteFromKeychain() {
-        val query = mapOf<Any?, Any?>(
-            kSecClass to kSecClassGenericPassword,
-            kSecAttrAccount to SERVICE_NAME,
-        )
-
-        SecItemDelete(query.toCFDictionary())
-    }
-
     companion object {
-        private const val SERVICE_NAME = "com.izzatismail.mealmap.auth"
+        private const val KEY = "com.izzatismail.mealmap.auth.token"
     }
 }
-
-@OptIn(ExperimentalForeignApi::class)
-private fun Map<Any?, Any?>.toCFDictionary(): CFDictionaryRef? {
-    val keys = this.keys.map { it as CFTypeRef }.toCValues().ptr
-    val values = this.values.map { it as CFTypeRef }.toCValues().ptr
-    return CFDictionaryCreate(
-        null, keys, values, this.size.toLong(), null, null
-    )
-}
-
-@OptIn(ExperimentalForeignApi::class)
-private fun <T> List<T>.toCValues(): CValuesRef<COpaquePointerVar>? = null
