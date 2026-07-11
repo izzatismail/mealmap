@@ -1,11 +1,14 @@
 package com.izzatismail.mealmap
 
 import android.app.Application
+import com.izzatismail.mealmap.api.AndroidTokenProvider
 import com.izzatismail.mealmap.api.ApiConfig
+import com.izzatismail.mealmap.api.TokenProvider
 import com.izzatismail.mealmap.database.DbConfig
 import com.izzatismail.mealmap.di.sharedModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 class MealMapApp : Application() {
     override fun onCreate() {
@@ -15,7 +18,9 @@ class MealMapApp : Application() {
         DbConfig.androidContext = this
         startKoin {
             androidContext(this@MealMapApp)
-            modules(sharedModule)
+            modules(sharedModule + module {
+                single<TokenProvider> { AndroidTokenProvider(this@MealMapApp) }
+            })
         }
     }
 }

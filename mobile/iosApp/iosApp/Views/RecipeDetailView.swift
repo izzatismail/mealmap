@@ -33,35 +33,35 @@ struct RecipeDetailView: View {
 
                     VStack(alignment: .leading, spacing: 16) {
                         Text(recipe.title)
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.titleLarge)
                             .foregroundColor(.textPrimary)
 
                         Text("\(recipe.readyInMinutes) min  ·  \(recipe.servings) servings  ·  \(Int(recipe.healthScore))% health")
-                            .font(.caption)
+                            .font(.bodySmall)
                             .foregroundColor(.textSecondary)
 
                         if !recipe.dishTypes.isEmpty {
                             Text(recipe.dishTypes.joined(separator: " · "))
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.labelSmall)
                                 .foregroundColor(.primary)
                         }
 
                         Text("Ingredients")
-                            .font(.system(size: 22, weight: .bold))
+                            .font(.headlineLarge)
                             .foregroundColor(.textPrimary)
 
                         ForEach(recipe.ingredients, id: \.id) { ingredient in
                             Text("• \(ingredient.original)")
-                                .font(.system(size: 14))
+                                .font(.bodyMedium)
                                 .foregroundColor(.textPrimary)
                         }
 
                         Text("Instructions")
-                            .font(.system(size: 22, weight: .bold))
+                            .font(.headlineLarge)
                             .foregroundColor(.textPrimary)
 
                         Text(recipe.instructions)
-                            .font(.system(size: 14))
+                            .font(.bodyMedium)
                             .foregroundColor(.textPrimary)
                     }
                     .padding(16)
