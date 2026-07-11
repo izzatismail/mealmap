@@ -35,23 +35,30 @@ class ShoppingListGeneratorService(
         val category: String,
     )
 
-    fun generateShoppingList(mealPlanId: Long, regenerate: Boolean = false): ShoppingListDto {
+    fun generateShoppingList(userId: Long, mealPlanId: Long, regenerate: Boolean = false): ShoppingListDto {
         val mealPlan = mealPlanRepository.findByIdWithPlannedMeals(mealPlanId)
             ?: throw ResourceNotFoundException("Meal plan not found with id: $mealPlanId")
+        if (mealPlan.user.id != userId) {
+            throw ResourceNotFoundException("Meal plan not found with id: $mealPlanId")
+        }
 
-        if (!regenerate) {
-            val existing = shoppingListRepository.findByMealPlanId(mealPlanId)
-            if (existing != null) {
-                log.info("Returning existing shopping list for meal plan {}", mealPlanId)
-                return existing.toDto()
-            }
+        val existing = shoppingListRepository.findByMealPlanId(mealPlanId)
+        if (!regenerate && existing != null) {
+            log.info("Returning existing shopping list for meal plan {}", mealPlanId)
+            return existing.toDto()
+        }
+
+        if (regenerate && existing != null) {
+            log.info("Regenerating shopping list for meal plan {}, removing old one", mealPlanId)
+            shoppingListRepository.delete(existing)
+            shoppingListRepository.flush()
         }
 
         log.info("Generating shopping list for meal plan {}", mealPlanId)
 
         val ingredients = extractIngredientsFromMealPlan(mealPlan)
         val aggregated = aggregateIngredients(ingredients)
-        val adjusted = subtractPantryItems(aggregated, mealPlan.user.id)
+        val adjusted = subtractPantryItems(aggregated, userId)
 
         val shoppingList = ShoppingList(
             mealPlan = mealPlan,
@@ -72,9 +79,12 @@ class ShoppingListGeneratorService(
         return saved.toDto()
     }
 
-    fun getShoppingList(id: Long): ShoppingListDto {
+    fun getShoppingList(userId: Long, id: Long): ShoppingListDto {
         val list = shoppingListRepository.findById(id)
             .orElseThrow { ResourceNotFoundException("Shopping list not found with id: $id") }
+        if (list.user.id != userId) {
+            throw ResourceNotFoundException("Shopping list not found with id: $id")
+        }
         return list.toDto()
     }
 
@@ -83,9 +93,12 @@ class ShoppingListGeneratorService(
             .firstOrNull()?.toDto()
     }
 
-    fun toggleItem(itemId: Long): ShoppingItemDto {
+    fun toggleItem(userId: Long, itemId: Long): ShoppingItemDto {
         val item = shoppingItemRepository.findById(itemId)
             .orElseThrow { ResourceNotFoundException("Shopping item not found with id: $itemId") }
+        if (item.shoppingList.user.id != userId) {
+            throw ResourceNotFoundException("Shopping item not found with id: $itemId")
+        }
         item.isChecked = !item.isChecked
         return shoppingItemRepository.save(item).toDto()
     }

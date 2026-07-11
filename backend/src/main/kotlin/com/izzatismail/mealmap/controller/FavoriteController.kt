@@ -55,8 +55,9 @@ class FavoriteController(
     fun removeFavorite(
         authentication: Authentication,
         @PathVariable recipeId: Long,
-    ) {
+    ): ResponseEntity<Unit> {
         val userId = SecurityUtil.getCurrentUserId(authentication)
         favoriteService.removeFavorite(userId, recipeId)
+        return ResponseEntity.noContent().build()
     }
 }

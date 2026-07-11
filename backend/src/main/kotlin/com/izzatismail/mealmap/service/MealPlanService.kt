@@ -1,8 +1,8 @@
 package com.izzatismail.mealmap.service
 
-import com.izzatismail.mealmap.dto.CreateMealPlanRequest
 import com.izzatismail.mealmap.dto.MealPlanDto
 import com.izzatismail.mealmap.dto.PlannedMealDto
+import com.izzatismail.mealmap.dto.CreateMealPlanRequest
 import com.izzatismail.mealmap.entity.MealPlan
 import com.izzatismail.mealmap.entity.MealType
 import com.izzatismail.mealmap.entity.PlannedMeal
@@ -26,9 +26,12 @@ class MealPlanService(
             .map { it.toDto() }
     }
 
-    fun getMealPlanById(id: Long): MealPlanDto {
+    fun getMealPlanById(userId: Long, id: Long): MealPlanDto {
         val mealPlan = mealPlanRepository.findByIdWithPlannedMeals(id)
             ?: throw ResourceNotFoundException("Meal plan not found with id: $id")
+        if (mealPlan.user.id != userId) {
+            throw ResourceNotFoundException("Meal plan not found with id: $id")
+        }
         return mealPlan.toDto()
     }
 
@@ -58,8 +61,10 @@ class MealPlanService(
         return saved.toDto()
     }
 
-    fun deleteMealPlan(id: Long) {
-        if (!mealPlanRepository.existsById(id)) {
+    fun deleteMealPlan(userId: Long, id: Long) {
+        val mealPlan = mealPlanRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException("Meal plan not found with id: $id") }
+        if (mealPlan.user.id != userId) {
             throw ResourceNotFoundException("Meal plan not found with id: $id")
         }
         mealPlanRepository.deleteById(id)

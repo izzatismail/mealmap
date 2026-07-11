@@ -42,15 +42,21 @@ class PantryController(
 
     @PutMapping("/{id}")
     fun updatePantryItem(
+        authentication: Authentication,
         @PathVariable id: Long,
         @Valid @RequestBody request: UpdatePantryItemRequest,
     ): ResponseEntity<PantryItemDto> {
-        val item = pantryService.updatePantryItem(id, request)
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        val item = pantryService.updatePantryItem(userId, id, request)
         return ResponseEntity.ok(item)
     }
 
     @DeleteMapping("/{id}")
-    fun deletePantryItem(@PathVariable id: Long) {
-        pantryService.deletePantryItem(id)
+    fun deletePantryItem(
+        authentication: Authentication,
+        @PathVariable id: Long,
+    ) {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        pantryService.deletePantryItem(userId, id)
     }
 }

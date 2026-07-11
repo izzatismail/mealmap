@@ -29,8 +29,12 @@ class MealPlanController(
     }
 
     @GetMapping("/{id}")
-    fun getMealPlanById(@PathVariable id: Long): ResponseEntity<MealPlanDto> {
-        return ResponseEntity.ok(mealPlanService.getMealPlanById(id))
+    fun getMealPlanById(
+        authentication: Authentication,
+        @PathVariable id: Long,
+    ): ResponseEntity<MealPlanDto> {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        return ResponseEntity.ok(mealPlanService.getMealPlanById(userId, id))
     }
 
     @PostMapping
@@ -44,7 +48,11 @@ class MealPlanController(
     }
 
     @DeleteMapping("/{id}")
-    fun deleteMealPlan(@PathVariable id: Long) {
-        mealPlanService.deleteMealPlan(id)
+    fun deleteMealPlan(
+        authentication: Authentication,
+        @PathVariable id: Long,
+    ) {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        mealPlanService.deleteMealPlan(userId, id)
     }
 }

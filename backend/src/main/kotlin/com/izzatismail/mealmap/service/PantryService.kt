@@ -1,9 +1,7 @@
 package com.izzatismail.mealmap.service
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.izzatismail.mealmap.dto.PantryItemRequest
 import com.izzatismail.mealmap.dto.PantryItemDto
+import com.izzatismail.mealmap.dto.PantryItemRequest
 import com.izzatismail.mealmap.dto.UpdatePantryItemRequest
 import com.izzatismail.mealmap.entity.PantryItem
 import com.izzatismail.mealmap.exception.ResourceNotFoundException
@@ -37,17 +35,21 @@ class PantryService(
         return pantryItemRepository.save(item).toDto()
     }
 
-    fun updatePantryItem(id: Long, request: UpdatePantryItemRequest): PantryItemDto {
+    fun updatePantryItem(userId: Long, id: Long, request: UpdatePantryItemRequest): PantryItemDto {
         val item = pantryItemRepository.findById(id)
             .orElseThrow { ResourceNotFoundException("Pantry item not found with id: $id") }
-
+        if (item.user.id != userId) {
+            throw ResourceNotFoundException("Pantry item not found with id: $id")
+        }
         item.amount = request.amount
         item.unit = request.unit
         return pantryItemRepository.save(item).toDto()
     }
 
-    fun deletePantryItem(id: Long) {
-        if (!pantryItemRepository.existsById(id)) {
+    fun deletePantryItem(userId: Long, id: Long) {
+        val item = pantryItemRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException("Pantry item not found with id: $id") }
+        if (item.user.id != userId) {
             throw ResourceNotFoundException("Pantry item not found with id: $id")
         }
         pantryItemRepository.deleteById(id)

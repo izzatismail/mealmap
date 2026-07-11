@@ -23,16 +23,22 @@ class ShoppingListController(
 
     @PostMapping("/meal-plans/{mealPlanId}/shopping-list")
     fun generateShoppingList(
+        authentication: Authentication,
         @PathVariable mealPlanId: Long,
         @RequestParam(defaultValue = "false") regenerate: Boolean,
     ): ResponseEntity<ShoppingListDto> {
-        val shoppingList = shoppingListGeneratorService.generateShoppingList(mealPlanId, regenerate)
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        val shoppingList = shoppingListGeneratorService.generateShoppingList(userId, mealPlanId, regenerate)
         return ResponseEntity.status(HttpStatus.CREATED).body(shoppingList)
     }
 
     @GetMapping("/shopping-lists/{id}")
-    fun getShoppingList(@PathVariable id: Long): ResponseEntity<ShoppingListDto> {
-        return ResponseEntity.ok(shoppingListGeneratorService.getShoppingList(id))
+    fun getShoppingList(
+        authentication: Authentication,
+        @PathVariable id: Long,
+    ): ResponseEntity<ShoppingListDto> {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        return ResponseEntity.ok(shoppingListGeneratorService.getShoppingList(userId, id))
     }
 
     @GetMapping("/shopping-lists/current")
@@ -42,8 +48,12 @@ class ShoppingListController(
     }
 
     @PatchMapping("/shopping-items/{itemId}/toggle")
-    fun toggleShoppingItem(@PathVariable itemId: Long): ResponseEntity<ShoppingItemDto> {
-        val item = shoppingListGeneratorService.toggleItem(itemId)
+    fun toggleShoppingItem(
+        authentication: Authentication,
+        @PathVariable itemId: Long,
+    ): ResponseEntity<ShoppingItemDto> {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        val item = shoppingListGeneratorService.toggleItem(userId, itemId)
         return ResponseEntity.ok(item)
     }
 }

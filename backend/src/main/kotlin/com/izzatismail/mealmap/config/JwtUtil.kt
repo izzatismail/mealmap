@@ -1,8 +1,11 @@
 package com.izzatismail.mealmap.config
 
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.Date
@@ -13,6 +16,7 @@ class JwtUtil(
     @Value("\${jwt.secret}") private val secret: String,
     @Value("\${jwt.expiration}") private val expiration: Long,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
     private val key: SecretKey by lazy {
         Keys.hmacShaKeyFor(secret.toByteArray())
     }
@@ -31,7 +35,11 @@ class JwtUtil(
     fun extractEmail(token: String): String? {
         return try {
             extractClaims(token).subject
-        } catch (e: Exception) {
+        } catch (e: ExpiredJwtException) {
+            log.debug("JWT token has expired")
+            null
+        } catch (e: JwtException) {
+            log.debug("Failed to extract email from JWT: {}", e.message)
             null
         }
     }
@@ -39,7 +47,11 @@ class JwtUtil(
     fun extractUserId(token: String): Long? {
         return try {
             extractClaims(token).get("userId", Long::class.java)
-        } catch (e: Exception) {
+        } catch (e: ExpiredJwtException) {
+            log.debug("JWT token has expired")
+            null
+        } catch (e: JwtException) {
+            log.debug("Failed to extract userId from JWT: {}", e.message)
             null
         }
     }
