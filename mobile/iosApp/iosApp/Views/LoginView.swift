@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @StateObject private var authViewModel = AuthViewModelWrapper()
+    @ObservedObject var authViewModel: AuthViewModelWrapper
     @State private var email = ""
     @State private var password = ""
     let onLoginSuccess: () -> Void
@@ -77,7 +77,7 @@ struct LoginView: View {
             .background(Color.primary)
             .foregroundColor(.white)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .disabled(authViewModel.isLoading)
+            .disabled(authViewModel.isLoading || email.isBlank() || password.isBlank())
             .padding(.horizontal, 24)
 
             Button(action: onNavigateToRegister) {
@@ -102,5 +102,11 @@ struct LoginView: View {
         .onChange(of: authViewModel.isLoggedIn) { loggedIn in
             if loggedIn { onLoginSuccess() }
         }
+    }
+}
+
+extension String {
+    func isBlank() -> Bool {
+        return trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

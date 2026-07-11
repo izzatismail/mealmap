@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 data class MealPlanUiState(
     val mealPlans: List<MealPlanDto> = emptyList(),
@@ -126,8 +129,9 @@ class MealPlanViewModel(
 
     companion object {
         fun currentDayOfWeek(): Int {
-            val days = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-            return 0
+            val now = Clock.System.now()
+            val localDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+            return localDateTime.dayOfWeek.ordinal
         }
     }
 }

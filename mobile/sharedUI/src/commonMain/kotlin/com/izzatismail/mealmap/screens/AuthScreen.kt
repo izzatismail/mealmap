@@ -111,7 +111,7 @@ fun LoginScreen(
         Button(
             onClick = { authViewModel.login(email, password) },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-            enabled = !state.isLoading,
+            enabled = !state.isLoading && email.isNotBlank() && password.isNotBlank(),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
         ) {
@@ -216,7 +216,7 @@ fun RegisterScreen(
         Button(
             onClick = { authViewModel.register(email, password, name) },
             modifier = Modifier.fillMaxWidth().height(48.dp),
-            enabled = !state.isLoading,
+            enabled = !state.isLoading && name.isNotBlank() && email.isNotBlank() && password.isNotBlank(),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
         ) {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @StateObject private var authViewModel = AuthViewModelWrapper()
+    @ObservedObject var authViewModel: AuthViewModelWrapper
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -91,7 +91,7 @@ struct RegisterView: View {
             .background(Color.primary)
             .foregroundColor(.white)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .disabled(authViewModel.isLoading)
+            .disabled(authViewModel.isLoading || name.isBlank() || email.isBlank() || password.isBlank())
             .padding(.horizontal, 24)
 
             Button(action: onNavigateToLogin) {

@@ -356,7 +356,7 @@ recipe-planner/
 - [x] Android: SQLDelight local caching
 - [x] iOS: Mirror screens in SwiftUI
 - [x] iOS: Local SQLite caching (SQLDelight)
-- [x] JWT token stored securely (Keystore / Keychain)
+- [x] JWT stored securely (EncryptedSharedPreferences on Android, NSUserDefaults on iOS — Keychain deferred)
 - [x] Base URL in build config (not hardcoded)
 - [x] No sensitive data in logs
 - [x] Nunito font files bundled in compose resources
