@@ -61,7 +61,7 @@ class MealPlanViewModel(
                 _state.value = MealPlanUiState(
                     mealPlans = plans,
                     currentWeekMeals = currentWeekPlan?.plannedMeals ?: emptyList(),
-                    selectedDay = currentDayOfWeek(),
+                    selectedDay = if (currentWeekPlan != null) _state.value.selectedDay else currentDayOfWeek(),
                     isLoading = false,
                 )
             } catch (e: Exception) {

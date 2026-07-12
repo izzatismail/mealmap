@@ -143,4 +143,20 @@ class MealPlanServiceTest {
         }
         assertTrue(exception.message!!.contains("not found"))
     }
+
+    @Test
+    fun `removeMealFromPlan throws when user does not own plan`() {
+        val otherUser = User(id = 999L, email = "[EMAIL]", password = "hashed")
+        val plan = createMealPlan(otherUser)
+        val recipe = createRecipe()
+        val meal = PlannedMeal(id = 10L, mealPlan = plan, recipe = recipe, mealType = MealType.DINNER, dayOfWeek = 1, servings = 2)
+        plan.plannedMeals.add(meal)
+
+        whenever(mealPlanRepository.findByIdWithPlannedMeals(planId)).thenReturn(plan)
+
+        val exception = assertThrows<ResourceNotFoundException> {
+            mealPlanService.removeMealFromPlan(userId, planId, 10L)
+        }
+        assertTrue(exception.message!!.contains("not found"))
+    }
 }

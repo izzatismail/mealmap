@@ -46,12 +46,8 @@ import com.izzatismail.mealmap.ui.components.WeekDayStrip
 import com.izzatismail.mealmap.ui.components.mealTypeEmoji
 import com.izzatismail.mealmap.ui.components.mealTypeLabel
 import com.izzatismail.mealmap.ui.theme.ColorBg
-import com.izzatismail.mealmap.ui.theme.ColorBorder
 import com.izzatismail.mealmap.ui.theme.ColorPrimary
-import com.izzatismail.mealmap.ui.theme.ColorPrimaryLight
-import com.izzatismail.mealmap.ui.theme.ColorTextPrimary
 import com.izzatismail.mealmap.ui.theme.ColorTextSecondary
-import com.izzatismail.mealmap.ui.theme.ColorTextTertiary
 import com.izzatismail.mealmap.viewmodel.MealPlanViewModel
 import com.izzatismail.mealmap.viewmodel.RecipeViewModel
 import org.koin.compose.koinInject
@@ -90,7 +86,7 @@ fun PlannerScreen(
 
         item {
             val days = dayLabels.mapIndexed { index, label ->
-                DayItem(label = label, dayIndex = index, isToday = index == 0)
+                DayItem(label = label, dayIndex = index, isToday = index == MealPlanViewModel.currentDayOfWeek())
             }
             WeekDayStrip(
                 days = days,
