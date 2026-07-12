@@ -570,7 +570,7 @@ Phase mapping:   v0.1.0 → Phase 1, v0.2.0 → Phase 2, v1.0.0 → Phase 6 (MVP
 | Branch | `build.gradle.kts` version | Meaning |
 |--------|---------------------------|---------|
 | `main` | `0.5.0` (no `-SNAPSHOT`) | Current release |
-| `develop` | `0.5.0` | Release candidate (pre-merge to main) |
+| `develop` | `0.6.0-SNAPSHOT` | Work in progress toward next release |
 
 **Release Workflow** (version bump happens in the PR, not after merge):
 
@@ -846,5 +846,5 @@ If any of the above is unclear — **ask before writing code.**
 
 ---
 
-*Last updated: Jul 11, 2026 — Phase 5 mobile UI complete. All screens built for both platforms (auth, favorites, meal planner, shopping list, pantry, home dashboard). Design system in parity across Android and iOS (Nunito fonts, color tokens, shadows). Keychain deferred — NSUserDefaults used on iOS pending Kotlin 2.4.0 interop stability. Next: Phase 6 — Polish & Deploy.*
+*Last updated: Jul 12, 2026 — Phase 5 complete. Meal plan mutation fix merged, v0.5.0 released. Next: Phase 6 — Polish & Deploy.*
 *Stack, phases, and security rules are agreed and locked for MVP.*
