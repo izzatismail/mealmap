@@ -1,6 +1,7 @@
 package com.izzatismail.mealmap.viewmodel
 
 import com.izzatismail.mealmap.api.MealPlanApi
+import com.izzatismail.mealmap.model.AddPlannedMealRequest
 import com.izzatismail.mealmap.model.MealPlanDto
 import com.izzatismail.mealmap.model.MealPlanRequest
 import com.izzatismail.mealmap.model.PlannedMealDto
@@ -14,7 +15,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
 data class MealPlanUiState(
@@ -34,6 +38,20 @@ class MealPlanViewModel(
     private val _state = MutableStateFlow(MealPlanUiState())
     val state: StateFlow<MealPlanUiState> = _state.asStateFlow()
 
+    private fun currentWeekStart(): String {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val daysFromMonday = now.dayOfWeek.ordinal
+        val monday = now.date.minus(daysFromMonday, DateTimeUnit.DAY)
+        return monday.toString()
+    }
+
+    private fun currentWeekEnd(): String {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val daysFromMonday = now.dayOfWeek.ordinal
+        val sunday = now.date.plus(6 - daysFromMonday, DateTimeUnit.DAY)
+        return sunday.toString()
+    }
+
     fun loadMealPlans() {
         _state.value = _state.value.copy(isLoading = true, error = null)
         scope.launch {
@@ -43,7 +61,7 @@ class MealPlanViewModel(
                 _state.value = MealPlanUiState(
                     mealPlans = plans,
                     currentWeekMeals = currentWeekPlan?.plannedMeals ?: emptyList(),
-                    selectedDay = currentDayOfWeek(),
+                    selectedDay = if (currentWeekPlan != null) _state.value.selectedDay else currentDayOfWeek(),
                     isLoading = false,
                 )
             } catch (e: Exception) {
@@ -64,20 +82,32 @@ class MealPlanViewModel(
             try {
                 val existingPlan = _state.value.mealPlans.firstOrNull()
                 if (existingPlan != null) {
-                    val currentRequests = existingPlan.plannedMeals.map {
-                        PlannedMealRequest(it.recipeId, it.mealType, it.dayOfWeek, it.servings)
-                    }
-                    val updatedMeals = currentRequests + PlannedMealRequest(
-                        recipeId = recipeId,
-                        mealType = mealType,
-                        dayOfWeek = dayOfWeek,
-                        servings = servings,
+                    val plan = mealPlanApi.addMeal(
+                        planId = existingPlan.id,
+                        request = AddPlannedMealRequest(
+                            recipeId = recipeId,
+                            mealType = mealType,
+                            dayOfWeek = dayOfWeek,
+                            servings = servings,
+                        ),
                     )
+                    _state.value = _state.value.copy(
+                        mealPlans = listOf(plan) + _state.value.mealPlans.drop(1),
+                        currentWeekMeals = plan.plannedMeals,
+                    )
+                } else {
                     val plan = mealPlanApi.createMealPlan(
                         MealPlanRequest(
-                            weekStart = existingPlan.weekStart,
-                            weekEnd = existingPlan.weekEnd,
-                            plannedMeals = updatedMeals,
+                            weekStart = currentWeekStart(),
+                            weekEnd = currentWeekEnd(),
+                            plannedMeals = listOf(
+                                PlannedMealRequest(
+                                    recipeId = recipeId,
+                                    mealType = mealType,
+                                    dayOfWeek = dayOfWeek,
+                                    servings = servings,
+                                )
+                            ),
                         )
                     )
                     _state.value = _state.value.copy(
@@ -97,18 +127,9 @@ class MealPlanViewModel(
         scope.launch {
             try {
                 val existingPlan = _state.value.mealPlans.firstOrNull() ?: return@launch
-                val updatedMeals = existingPlan.plannedMeals
-                    .filter { it.id != plannedMealId }
-                    .map { PlannedMealRequest(it.recipeId, it.mealType, it.dayOfWeek, it.servings) }
-                val plan = mealPlanApi.createMealPlan(
-                    MealPlanRequest(
-                        weekStart = existingPlan.weekStart,
-                        weekEnd = existingPlan.weekEnd,
-                        plannedMeals = updatedMeals,
-                    )
-                )
+                val plan = mealPlanApi.removeMeal(existingPlan.id, plannedMealId)
                 _state.value = _state.value.copy(
-                    mealPlans = listOf(plan),
+                    mealPlans = listOf(plan) + _state.value.mealPlans.drop(1),
                     currentWeekMeals = plan.plannedMeals,
                 )
             } catch (e: Exception) {

@@ -36,3 +36,11 @@ data class PlannedMealRequest(
     val dayOfWeek: Int,
     val servings: Int,
 )
+
+@Serializable
+data class AddPlannedMealRequest(
+    val recipeId: Long,
+    val mealType: String,
+    val dayOfWeek: Int,
+    val servings: Int,
+)

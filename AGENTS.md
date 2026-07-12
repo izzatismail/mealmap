@@ -393,7 +393,7 @@ recipe-planner/
 - [ ] iOS Keychain (deferred: NSUserDefaults used while Kotlin 2.4.0 interop is unstable)
 
 **Known Issues — Fix Before Next Phase:**
-- [ ] **Meal plan overwrites on add/remove** — `MealPlanViewModel.addMealToDay()` and `removeMeal()` call `POST /api/meal-plans` which replaces the entire plan. Backend needs a PATCH endpoint (e.g. `POST /api/meal-plans/{id}/meals`) for individual meal mutations. Currently works by re-sending all meals, but orphaned plans accumulate on the backend.
+- [x] **Meal plan overwrites on add/remove** — Fixed by adding backend endpoints `POST /api/meal-plans/{planId}/meals` and `DELETE /api/meal-plans/{planId}/meals/{mealId}` for individual meal mutations. ViewModel uses these instead of re-sending the entire plan. No orphaned plans accumulate.
 
 **Phase 5 Complete When:** Full end-to-end flow works — login → browse → plan → generate shopping list
 

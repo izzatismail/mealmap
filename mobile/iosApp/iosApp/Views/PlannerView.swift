@@ -4,6 +4,7 @@ import SharedLogic
 struct PlannerView: View {
     @StateObject private var viewModel = MealPlanViewModelWrapper()
     @State private var selectedDay = 0
+    @State private var mealToRemove: Int64?
 
     private let dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     private let mealTypes = ["Breakfast", "Lunch", "Dinner"]
@@ -68,15 +69,36 @@ struct PlannerView: View {
                     .padding(.top, 8)
                     .padding(.bottom, 4)
 
-                    MealSlotView(recipe: nil, mealType: type)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 4)
+                    MealSlotView(
+                        recipe: nil,
+                        mealType: type,
+                        mealTitle: meal?.recipeTitle ?? "",
+                        showRemoveButton: meal != nil,
+                        onRemove: {
+                            if let meal = meal {
+                                mealToRemove = meal.id
+                            }
+                        }
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 4)
                 }
             }
         }
         .background(Color.background)
         .onAppear {
             viewModel.loadMealPlans()
+        }
+        .alert("Remove Meal", isPresented: .constant(mealToRemove != nil)) {
+            Button("Cancel", role: .cancel) { mealToRemove = nil }
+            Button("Remove", role: .destructive) {
+                if let id = mealToRemove {
+                    viewModel.removeMeal(plannedMealId: id)
+                }
+                mealToRemove = nil
+            }
+        } message: {
+            Text("Are you sure you want to remove this meal?")
         }
     }
 }
