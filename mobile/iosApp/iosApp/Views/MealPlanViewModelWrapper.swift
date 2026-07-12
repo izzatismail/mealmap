@@ -33,4 +33,8 @@ class MealPlanViewModelWrapper: ObservableObject {
     func addMealToDay(recipeId: Int64, mealType: String, dayOfWeek: Int32, servings: Int32 = 1) {
         viewModel.addMealToDay(recipeId: recipeId, mealType: mealType, dayOfWeek: dayOfWeek, servings: servings)
     }
+
+    func removeMeal(plannedMealId: Int64) {
+        viewModel.removeMeal(plannedMealId: plannedMealId)
+    }
 }

@@ -1,5 +1,6 @@
 package com.izzatismail.mealmap.service
 
+import com.izzatismail.mealmap.dto.AddPlannedMealRequest
 import com.izzatismail.mealmap.dto.MealPlanDto
 import com.izzatismail.mealmap.dto.PlannedMealDto
 import com.izzatismail.mealmap.dto.CreateMealPlanRequest
@@ -68,6 +69,39 @@ class MealPlanService(
             throw ResourceNotFoundException("Meal plan not found with id: $id")
         }
         mealPlanRepository.deleteById(id)
+    }
+
+    fun addMealToPlan(userId: Long, planId: Long, request: AddPlannedMealRequest): MealPlanDto {
+        val mealPlan = mealPlanRepository.findByIdWithPlannedMeals(planId)
+            ?: throw ResourceNotFoundException("Meal plan not found with id: $planId")
+        if (mealPlan.user.id != userId) {
+            throw ResourceNotFoundException("Meal plan not found with id: $planId")
+        }
+        val recipe = recipeRepository.findById(request.recipeId)
+            .orElseThrow { ResourceNotFoundException("Recipe not found with id: ${request.recipeId}") }
+        val plannedMeal = PlannedMeal(
+            mealPlan = mealPlan,
+            recipe = recipe,
+            mealType = MealType.valueOf(request.mealType.uppercase()),
+            dayOfWeek = request.dayOfWeek,
+            servings = request.servings,
+        )
+        mealPlan.plannedMeals.add(plannedMeal)
+        val saved = mealPlanRepository.save(mealPlan)
+        return saved.toDto()
+    }
+
+    fun removeMealFromPlan(userId: Long, planId: Long, mealId: Long): MealPlanDto {
+        val mealPlan = mealPlanRepository.findByIdWithPlannedMeals(planId)
+            ?: throw ResourceNotFoundException("Meal plan not found with id: $planId")
+        if (mealPlan.user.id != userId) {
+            throw ResourceNotFoundException("Meal plan not found with id: $planId")
+        }
+        val meal = mealPlan.plannedMeals.find { it.id == mealId }
+            ?: throw ResourceNotFoundException("Planned meal not found with id: $mealId")
+        mealPlan.plannedMeals.remove(meal)
+        val saved = mealPlanRepository.save(mealPlan)
+        return saved.toDto()
     }
 
     private fun MealPlan.toDto() = MealPlanDto(

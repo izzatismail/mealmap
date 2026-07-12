@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -66,6 +69,7 @@ fun PlannerScreen(
     val recipeState by recipeViewModel.listState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var addingMealType by remember { mutableStateOf("") }
+    var showRemoveDialog by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(Unit) {
         mealPlanViewModel.loadMealPlans()
@@ -146,20 +150,22 @@ fun PlannerScreen(
                 }
             }
             item {
-                val recipe = if (meal != null) {
-                    // We don't have full recipe data in the meal plan, show placeholder
-                    null
-                } else null
-
                 MealSlot(
                     recipe = null,
                     mealType = type,
+                    hasMeal = meal != null,
+                    mealTitle = meal?.recipeTitle ?: "",
                     onClick = {
                         if (meal != null) {
                             onRecipeClick(meal.recipeId)
                         } else {
                             addingMealType = type
                             showAddDialog = true
+                        }
+                    },
+                    onRemove = {
+                        if (meal != null) {
+                            showRemoveDialog = meal.id
                         }
                     },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -170,6 +176,29 @@ fun PlannerScreen(
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+
+    if (showRemoveDialog != null) {
+        AlertDialog(
+            onDismissRequest = { showRemoveDialog = null },
+            title = { Text("Remove Meal") },
+            text = { Text("Are you sure you want to remove this meal?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showRemoveDialog?.let { mealPlanViewModel.removeMeal(it) }
+                        showRemoveDialog = null
+                    },
+                ) {
+                    Text("Remove", color = ColorPrimary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRemoveDialog = null }) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 
     if (showAddDialog) {

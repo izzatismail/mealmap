@@ -1,6 +1,7 @@
 package com.izzatismail.mealmap.controller
 
 import com.izzatismail.mealmap.config.SecurityUtil
+import com.izzatismail.mealmap.dto.AddPlannedMealRequest
 import com.izzatismail.mealmap.dto.CreateMealPlanRequest
 import com.izzatismail.mealmap.dto.MealPlanDto
 import com.izzatismail.mealmap.service.MealPlanService
@@ -54,5 +55,27 @@ class MealPlanController(
     ) {
         val userId = SecurityUtil.getCurrentUserId(authentication)
         mealPlanService.deleteMealPlan(userId, id)
+    }
+
+    @PostMapping("/{planId}/meals")
+    fun addMealToPlan(
+        authentication: Authentication,
+        @PathVariable planId: Long,
+        @Valid @RequestBody request: AddPlannedMealRequest,
+    ): ResponseEntity<MealPlanDto> {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        val mealPlan = mealPlanService.addMealToPlan(userId, planId, request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(mealPlan)
+    }
+
+    @DeleteMapping("/{planId}/meals/{mealId}")
+    fun removeMealFromPlan(
+        authentication: Authentication,
+        @PathVariable planId: Long,
+        @PathVariable mealId: Long,
+    ): ResponseEntity<MealPlanDto> {
+        val userId = SecurityUtil.getCurrentUserId(authentication)
+        val mealPlan = mealPlanService.removeMealFromPlan(userId, planId, mealId)
+        return ResponseEntity.ok(mealPlan)
     }
 }

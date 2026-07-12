@@ -1,5 +1,6 @@
 package com.izzatismail.mealmap.api
 
+import com.izzatismail.mealmap.model.AddPlannedMealRequest
 import com.izzatismail.mealmap.model.MealPlanDto
 import com.izzatismail.mealmap.model.MealPlanRequest
 import io.ktor.client.HttpClient
@@ -27,6 +28,17 @@ class MealPlanApi(
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
+    }
+
+    suspend fun addMeal(planId: Long, request: AddPlannedMealRequest): MealPlanDto {
+        return httpClient.post("${ApiConfig.baseUrl}/api/meal-plans/$planId/meals") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun removeMeal(planId: Long, mealId: Long): MealPlanDto {
+        return httpClient.delete("${ApiConfig.baseUrl}/api/meal-plans/$planId/meals/$mealId").body()
     }
 
     suspend fun deleteMealPlan(id: Long) {
