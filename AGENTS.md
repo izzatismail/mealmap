@@ -569,8 +569,8 @@ Phase mapping:   v0.1.0 → Phase 1, v0.2.0 → Phase 2, v1.0.0 → Phase 6 (MVP
 
 | Branch | `build.gradle.kts` version | Meaning |
 |--------|---------------------------|---------|
-| `main` | `0.2.0` (no `-SNAPSHOT`) | Current release |
-| `develop` | `0.3.0-SNAPSHOT` | Work in progress toward next release |
+| `main` | `0.5.0` (no `-SNAPSHOT`) | Current release |
+| `develop` | `0.5.0` | Release candidate (pre-merge to main) |
 
 **Release Workflow** (version bump happens in the PR, not after merge):
 
