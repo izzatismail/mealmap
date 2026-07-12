@@ -143,6 +143,23 @@ struct HomeView: View {
 struct MealSlotView: View {
     let recipe: Recipe?
     let mealType: String
+    let mealTitle: String
+    let showRemoveButton: Bool
+    var onRemove: (() -> Void)?
+
+    init(
+        recipe: Recipe? = nil,
+        mealType: String,
+        mealTitle: String = "",
+        showRemoveButton: Bool = false,
+        onRemove: (() -> Void)? = nil
+    ) {
+        self.recipe = recipe
+        self.mealType = mealType
+        self.mealTitle = mealTitle
+        self.showRemoveButton = showRemoveButton
+        self.onRemove = onRemove
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -167,6 +184,19 @@ struct MealSlotView: View {
                         .font(.bodySmall)
                         .foregroundColor(.textSecondary)
                 }
+            } else if showRemoveButton {
+                Text(emojiForMealType(mealType))
+                    .font(.titleLarge)
+                    .frame(width: 56, height: 56)
+                    .background(Color.primaryLight)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(mealTitle)
+                        .font(.bodyLarge)
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+                }
             } else {
                 Text("+")
                     .font(.titleLarge)
@@ -179,11 +209,36 @@ struct MealSlotView: View {
                     .font(.bodyLarge)
                     .foregroundColor(.textSecondary)
             }
+
+            Spacer()
+
+            if showRemoveButton {
+                Button(action: { onRemove?() }) {
+                    Text("✕")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.error)
+                        .frame(width: 28, height: 28)
+                        .background(Color.errorLight)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
         }
         .padding(12)
         .background(Color.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color(red: 60/255, green: 50/255, blue: 40/255).opacity(0.06), radius: 8, x: 0, y: 2)
+    }
+
+    private func emojiForMealType(_ type: String) -> String {
+        switch type.uppercased() {
+        case "BREAKFAST": return "\u{1F95A}"
+        case "LUNCH": return "\u{1F957}"
+        case "DINNER": return "\u{1F37D}\u{FE0F}"
+        case "SNACK": return "\u{1F35F}"
+        default: return "\u{1F374}"
+        }
     }
 }
 
