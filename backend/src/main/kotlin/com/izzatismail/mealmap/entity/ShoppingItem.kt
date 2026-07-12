@@ -35,7 +35,7 @@ class ShoppingItem(
     val unit: String,
 
     @Column(name = "is_checked", nullable = false)
-    val isChecked: Boolean = false,
+    var isChecked: Boolean = false,
 
     val category: String = "",
 )

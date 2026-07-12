@@ -29,8 +29,8 @@ android {
         applicationId = "com.izzatismail.mealmap"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 5
-        versionName = "0.4.1"
+        versionCode = 6
+        versionName = "0.5.0"
 
         buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080\"")
     }

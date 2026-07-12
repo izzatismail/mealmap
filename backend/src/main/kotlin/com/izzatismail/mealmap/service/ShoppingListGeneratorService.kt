@@ -11,6 +11,7 @@ import com.izzatismail.mealmap.entity.ShoppingList
 import com.izzatismail.mealmap.exception.ResourceNotFoundException
 import com.izzatismail.mealmap.repository.MealPlanRepository
 import com.izzatismail.mealmap.repository.PantryItemRepository
+import com.izzatismail.mealmap.repository.ShoppingItemRepository
 import com.izzatismail.mealmap.repository.ShoppingListRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 class ShoppingListGeneratorService(
     private val mealPlanRepository: MealPlanRepository,
     private val shoppingListRepository: ShoppingListRepository,
+    private val shoppingItemRepository: ShoppingItemRepository,
     private val pantryItemRepository: PantryItemRepository,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
@@ -33,23 +35,30 @@ class ShoppingListGeneratorService(
         val category: String,
     )
 
-    fun generateShoppingList(mealPlanId: Long): ShoppingListDto {
+    fun generateShoppingList(userId: Long, mealPlanId: Long, regenerate: Boolean = false): ShoppingListDto {
         val mealPlan = mealPlanRepository.findByIdWithPlannedMeals(mealPlanId)
             ?: throw ResourceNotFoundException("Meal plan not found with id: $mealPlanId")
+        if (mealPlan.user.id != userId) {
+            throw ResourceNotFoundException("Meal plan not found with id: $mealPlanId")
+        }
 
         val existing = shoppingListRepository.findByMealPlanId(mealPlanId)
-        if (existing != null) {
+        if (!regenerate && existing != null) {
             log.info("Returning existing shopping list for meal plan {}", mealPlanId)
             return existing.toDto()
+        }
+
+        if (regenerate && existing != null) {
+            log.info("Regenerating shopping list for meal plan {}, removing old one", mealPlanId)
+            shoppingListRepository.delete(existing)
+            shoppingListRepository.flush()
         }
 
         log.info("Generating shopping list for meal plan {}", mealPlanId)
 
         val ingredients = extractIngredientsFromMealPlan(mealPlan)
-
         val aggregated = aggregateIngredients(ingredients)
-
-        val adjusted = subtractPantryItems(aggregated, mealPlan.user.id)
+        val adjusted = subtractPantryItems(aggregated, userId)
 
         val shoppingList = ShoppingList(
             mealPlan = mealPlan,
@@ -68,6 +77,30 @@ class ShoppingListGeneratorService(
         val saved = shoppingListRepository.save(shoppingList)
         log.info("Generated shopping list with {} items for meal plan {}", saved.items.size, mealPlanId)
         return saved.toDto()
+    }
+
+    fun getShoppingList(userId: Long, id: Long): ShoppingListDto {
+        val list = shoppingListRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException("Shopping list not found with id: $id") }
+        if (list.user.id != userId) {
+            throw ResourceNotFoundException("Shopping list not found with id: $id")
+        }
+        return list.toDto()
+    }
+
+    fun getLatestShoppingList(userId: Long): ShoppingListDto? {
+        return shoppingListRepository.findByUserIdOrderByGeneratedAtDesc(userId)
+            .firstOrNull()?.toDto()
+    }
+
+    fun toggleItem(userId: Long, itemId: Long): ShoppingItemDto {
+        val item = shoppingItemRepository.findById(itemId)
+            .orElseThrow { ResourceNotFoundException("Shopping item not found with id: $itemId") }
+        if (item.shoppingList.user.id != userId) {
+            throw ResourceNotFoundException("Shopping item not found with id: $itemId")
+        }
+        item.isChecked = !item.isChecked
+        return shoppingItemRepository.save(item).toDto()
     }
 
     private fun extractIngredientsFromMealPlan(mealPlan: MealPlan): List<SpoonacularIngredient> {
@@ -109,7 +142,7 @@ class ShoppingListGeneratorService(
         aggregated: List<AggregatedIngredient>,
         userId: Long,
     ): List<AggregatedIngredient> {
-        val pantryItems = pantryItemRepository.findByUserId(userId) ?: emptyList()
+        val pantryItems = pantryItemRepository.findByUserId(userId)
         if (pantryItems.isEmpty()) return aggregated
 
         return aggregated.map { agg ->
